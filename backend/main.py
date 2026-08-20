@@ -22,7 +22,7 @@ def parse_comtrade_cfg(cfg_content: str) -> Dict[str, Any]:
     
     # First line: Station Name and Recorder ID
     parts0 = [part.strip().strip('"') for part in lines[0].split(',')]
-    station_name = parts0[0] if len(parts0) > 0 else "Subestação Industrial"
+    station_name = parts0[0] if len(parts0) > 0 else "Industrial Substation"
     recorder_id = parts0[1] if len(parts0) > 1 else "IED_01"
     
     # Second line: Version and year
@@ -108,7 +108,6 @@ def parse_comtrade_cfg(cfg_content: str) -> Dict[str, Any]:
         except ValueError:
             sample_rate = 10000.0
             nr_samples = 1000
-
     
     return {
         "station_name": station_name,
@@ -127,8 +126,7 @@ def parse_comtrade_cfg(cfg_content: str) -> Dict[str, Any]:
 
 def parse_comtrade_dat(dat_content: bytes, cfg_metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Parse the COMTRADE data file (.dat) based on the configuration.
-    Returns a dictionary with time and analog channel data.
+    Parse the COMTRADE data file (.dat) based on configuration metadata.
     """
     try:
         dat_text = dat_content.decode('utf-8')
@@ -256,44 +254,44 @@ def diagnose_fault(rms_a: float, rms_b: float, rms_c: float, sym_comp: Dict[str,
         phase = "A" if rms_a <= min_rms else ("B" if rms_b <= min_rms else "C")
         return {
             "faultType": f"PHASE_{phase}_GROUND",
-            "faultTypeName": f"Curto-Circuito Monofásico Fase-Terra ({phase}-G)",
+            "faultTypeName": f"Single Phase-to-Ground Fault ({phase}-G)",
             "severity": "CRITICAL",
-            "description": f"Detectada elevação severa de sequência zero (V0 = {zero_mag}V) com colapso na Fase {phase} ({min_rms}V). Rompimento de isolação para terra.",
+            "description": f"Severe zero-sequence elevation detected (V0 = {zero_mag}V) with voltage collapse on Phase {phase} ({min_rms}V). Characteristic of insulation breakdown to ground.",
             "confidence": 94.8,
             "durationMs": 45.2,
-            "recommendation": "Inspecionar isoladores da fase afetada e relé de sobrecorrente de neutro (ANSI 50N/51N)."
+            "recommendation": "Inspect phase insulators, feeder cables, and ground overcurrent protection relay (ANSI 50N/51N)."
         }
     
     if vuf > 15 and zero_mag < 0.1 * pos_mag:
         return {
             "faultType": "PHASE_AB_FAULT",
-            "faultTypeName": "Curto-Circuito Bifásico Entre Fases (Fase-Fase)",
+            "faultTypeName": "Phase-to-Phase Fault (Line-to-Line)",
             "severity": "CRITICAL",
-            "description": f"Desbalanço severo com alta sequência negativa (VUF = {vuf}%). Sem envolvimento significativo de terra.",
+            "description": f"Severe unbalance with high negative sequence component (VUF = {vuf}%). No significant ground involvement.",
             "confidence": 91.5,
             "durationMs": 62.0,
-            "recommendation": "Verificar distanciamento dielétrico entre barramentos e relés de proteção diferencial (ANSI 87)."
+            "recommendation": "Verify busbar dielectric clearances and distance/differential protection relays (ANSI 87/21)."
         }
     
     if max_thd > 8.0:
         return {
             "faultType": "HARMONIC_DISTORTION",
-            "faultTypeName": "Poluição Harmônica Severa (THD Excessivo)",
+            "faultTypeName": "Severe Harmonic Pollution (Excessive THD)",
             "severity": "HIGH",
-            "description": f"THD detectado em {max_thd}% (limite IEEE 519 é 5% a 8%). Risco de sobreaquecimento e queima de capacitores.",
+            "description": f"THD measured at {max_thd}% (IEEE 519 standard limit is 5% to 8%). Risk of transformer overheating and capacitor bank failure.",
             "confidence": 96.2,
             "durationMs": 0,
-            "recommendation": "Instalar filtros harmônicos ativos e reatores de linha em inversores de frequência (VFDs)."
+            "recommendation": "Install active harmonic filters and line reactors on variable frequency drives (VFDs)."
         }
         
     return {
         "faultType": "NORMAL",
-        "faultTypeName": "Regime Permanente Estável (Sem Faltas)",
+        "faultTypeName": "Steady-State Normal Operation (No Faults)",
         "severity": "NORMAL",
-        "description": f"Formas de onda balanceadas (VUF = {vuf}%), baixos harmônicos e valor RMS dentro dos limites normativos.",
+        "description": f"Balanced three-phase waveforms (VUF = {vuf}%), low harmonic distortion, and RMS values within standard limits.",
         "confidence": 99.1,
         "durationMs": 0,
-        "recommendation": "Nenhuma ação corretiva necessária. Manter cronograma de manutenção preditiva."
+        "recommendation": "No corrective action required. Maintain standard predictive maintenance schedule."
     }
 
 def analyze_comtrade(cfg_content: str, dat_content: bytes, assumed_sample_rate: float = 10000.0) -> Dict[str, Any]:
@@ -361,7 +359,7 @@ def analyze_comtrade(cfg_content: str, dat_content: bytes, assumed_sample_rate: 
             results = {
                 "metadata": cfg,
                 "time_series": data,
-                "message": "Canais insuficientes para decomposição trifásica."
+                "message": "Insufficient analog channels for three-phase symmetrical component decomposition."
             }
         
         return {"status": "success", "results": results}

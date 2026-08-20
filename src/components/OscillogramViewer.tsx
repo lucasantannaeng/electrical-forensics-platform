@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { TimeSeriesData, AnalogChannel } from '@/types/forensics';
-import { Activity, Maximize2, RefreshCw, Layers } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 interface OscillogramViewerProps {
   timeSeries: TimeSeriesData;
@@ -183,10 +183,10 @@ export const OscillogramViewer: React.FC<OscillogramViewerProps> = ({ timeSeries
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-cyan-400" />
           <h3 className="text-sm font-semibold tracking-wide text-slate-200 uppercase font-mono">
-            Oscilografia Trifásica IEEE COMTRADE
+            Three-Phase Oscillography (IEEE COMTRADE)
           </h3>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-700/40">
-            {numPoints} Amostras
+            {numPoints} Samples
           </span>
         </div>
 
@@ -226,7 +226,7 @@ export const OscillogramViewer: React.FC<OscillogramViewerProps> = ({ timeSeries
         {hoverIndex !== null && hoverIndex >= 0 && (
           <div className="absolute top-2 right-2 bg-industrial-900/90 backdrop-blur-md border border-cyan-500/40 rounded-lg p-2 text-[11px] font-mono shadow-xl space-y-0.5">
             <div className="text-slate-400 border-b border-industrial-700 pb-0.5 mb-1">
-              t = {((time[hoverIndex] || 0) / 1000).toFixed(2)} ms (Amostra #{hoverIndex + 1})
+              t = {((time[hoverIndex] || 0) / 1000).toFixed(2)} ms (Sample #{hoverIndex + 1})
             </div>
             {channelKeys.map((k, idx) => (
               <div key={k} className="flex items-center justify-between gap-3" style={{ color: colors[idx % colors.length] }}>

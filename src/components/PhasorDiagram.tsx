@@ -1,6 +1,6 @@
 import React from 'react';
 import { SymmetricalComponents } from '@/types/forensics';
-import { Compass, Zap } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 interface PhasorDiagramProps {
   symmetricalComponents: SymmetricalComponents;
@@ -40,7 +40,7 @@ export const PhasorDiagram: React.FC<PhasorDiagramProps> = ({ symmetricalCompone
         <div className="flex items-center gap-2">
           <Compass className="w-4 h-4 text-cyan-400" />
           <h3 className="text-sm font-semibold tracking-wide text-slate-200 uppercase font-mono">
-            Diagrama Fasorial & Fortescue
+            Phasor Diagram & Symmetrical Components
           </h3>
         </div>
         <span
@@ -88,7 +88,7 @@ export const PhasorDiagram: React.FC<PhasorDiagramProps> = ({ symmetricalCompone
         <div className="space-y-2 text-xs font-mono">
           <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80">
             <div className="text-[11px] text-slate-400 flex items-center justify-between mb-1">
-              <span>Sequência Positiva (V₁)</span>
+              <span>Positive Sequence (V₁)</span>
               <span className="text-cyan-400 font-bold">{posMagAvg.toFixed(1)} V</span>
             </div>
             <div className="w-full bg-industrial-950 h-1.5 rounded-full overflow-hidden">
@@ -98,7 +98,7 @@ export const PhasorDiagram: React.FC<PhasorDiagramProps> = ({ symmetricalCompone
 
           <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80">
             <div className="text-[11px] text-slate-400 flex items-center justify-between mb-1">
-              <span>Sequência Negativa (V₂)</span>
+              <span>Negative Sequence (V₂)</span>
               <span className="text-amber-400 font-bold">{negMagAvg.toFixed(1)} V</span>
             </div>
             <div className="w-full bg-industrial-950 h-1.5 rounded-full overflow-hidden">
@@ -108,7 +108,7 @@ export const PhasorDiagram: React.FC<PhasorDiagramProps> = ({ symmetricalCompone
 
           <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80">
             <div className="text-[11px] text-slate-400 flex items-center justify-between mb-1">
-              <span>Sequência Zero (V₀)</span>
+              <span>Zero Sequence (V₀)</span>
               <span className="text-rose-400 font-bold">{zeroMagAvg.toFixed(1)} V</span>
             </div>
             <div className="w-full bg-industrial-950 h-1.5 rounded-full overflow-hidden">

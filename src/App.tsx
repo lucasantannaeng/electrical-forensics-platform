@@ -3,15 +3,7 @@ import {
   Shield,
   Upload,
   Zap,
-  Activity,
-  FileText,
   RefreshCw,
-  FolderOpen,
-  Sparkles,
-  CheckCircle2,
-  AlertTriangle,
-  Server,
-  Layers
 } from 'lucide-react';
 import { ForensicAnalysisResult } from '@/types/forensics';
 import { analyzeComtradeClient, getSampleComtrade } from '@/utils/comtradeParser';
@@ -50,7 +42,7 @@ export default function App() {
       const result = analyzeComtradeClient(sample.cfg, sample.dat);
       setAnalysisResult(result);
     } catch (err) {
-      console.error('Falha ao processar amostra:', err);
+      console.error('Failed to load COMTRADE sample:', err);
     } finally {
       setLoading(false);
     }
@@ -58,7 +50,7 @@ export default function App() {
 
   const handleFileUpload = async () => {
     if (!cfgFile || !datFile) {
-      alert('Por favor, selecione ambos os arquivos (.cfg e .dat) do registro COMTRADE.');
+      alert('Please select both COMTRADE files (.cfg and .dat) to perform analysis.');
       return;
     }
 
@@ -81,7 +73,6 @@ export default function App() {
         if (res.ok) {
           const data = await res.json();
           if (data.results) {
-            // Also run client diagnosis for UI enrichment
             const clientParsed = analyzeComtradeClient(cfgText, datText);
             setAnalysisResult({ ...clientParsed, ...data.results });
             setLoading(false);
@@ -94,7 +85,7 @@ export default function App() {
       const result = analyzeComtradeClient(cfgText, datText);
       setAnalysisResult(result);
     } catch (err: any) {
-      alert(`Erro ao analisar arquivos COMTRADE: ${err.message || err}`);
+      alert(`Error analyzing COMTRADE files: ${err.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -119,7 +110,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Diagnóstico Pericial Automatizado de Oscilografias e Perturbações Industriais
+                Automated Forensic Diagnosis of Industrial Oscillograms and Power Distortions
               </p>
             </div>
           </div>
@@ -127,7 +118,7 @@ export default function App() {
           {/* Quick HUD controls & sample buttons */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 p-1 bg-industrial-950 rounded-lg border border-industrial-700 text-xs font-mono">
-              <span className="text-[10px] text-slate-400 px-2">Cenários:</span>
+              <span className="text-[10px] text-slate-400 px-2">Scenarios:</span>
               <button
                 onClick={() => loadSample('ground_fault')}
                 className={`px-2.5 py-1 rounded transition-all ${
@@ -136,7 +127,7 @@ export default function App() {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Fase-Terra (A-G)
+                Phase-to-Ground (A-G)
               </button>
               <button
                 onClick={() => loadSample('harmonics')}
@@ -146,7 +137,7 @@ export default function App() {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Harmônicas
+                Harmonics
               </button>
               <button
                 onClick={() => loadSample('normal')}
@@ -156,7 +147,7 @@ export default function App() {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Regime Normal
+                Normal Operation
               </button>
             </div>
 
@@ -168,7 +159,7 @@ export default function App() {
                 }`}
               />
               <span className="text-slate-400">
-                {backendOnline ? 'FastAPI Online' : 'Client Engine Ativo'}
+                {backendOnline ? 'FastAPI Online' : 'Client Engine Active'}
               </span>
             </div>
           </div>
@@ -183,12 +174,12 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Upload className="w-4 h-4 text-cyan-400" />
               <h2 className="text-xs font-mono font-semibold text-slate-200 uppercase tracking-wide">
-                Ingestão de Arquivos COMTRADE (.cfg + .dat)
+                COMTRADE File Ingestion (.cfg + .dat)
               </h2>
             </div>
             {analysisResult && (
               <span className="text-[11px] font-mono text-cyan-400">
-                Estação: <b>{analysisResult.metadata.station_name}</b> | IED: <b>{analysisResult.metadata.recorder_id}</b>
+                Substation: <b>{analysisResult.metadata.station_name}</b> | IED: <b>{analysisResult.metadata.recorder_id}</b>
               </span>
             )}
           </div>
@@ -197,7 +188,7 @@ export default function App() {
             {/* File .cfg */}
             <div className="p-3 rounded-lg bg-industrial-950/80 border border-industrial-700/80 flex flex-col justify-between">
               <label className="text-[11px] font-mono text-slate-400 mb-1 block">
-                1. Arquivo de Configuração (.cfg)
+                1. Configuration File (.cfg)
               </label>
               <input
                 type="file"
@@ -211,7 +202,7 @@ export default function App() {
             {/* File .dat */}
             <div className="p-3 rounded-lg bg-industrial-950/80 border border-industrial-700/80 flex flex-col justify-between">
               <label className="text-[11px] font-mono text-slate-400 mb-1 block">
-                2. Arquivo de Dados (.dat)
+                2. Data File (.dat)
               </label>
               <input
                 type="file"
@@ -230,7 +221,7 @@ export default function App() {
                 className="w-full py-2.5 px-4 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-mono font-semibold text-xs tracking-wide transition-all shadow-md shadow-cyan-950/50 flex items-center justify-center gap-2"
               >
                 {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                Processar Oscilografia
+                Process Oscillogram
               </button>
             </div>
           </div>
@@ -277,7 +268,7 @@ export default function App() {
 
       {/* Industrial Footer */}
       <footer className="bg-industrial-900/90 border-t border-industrial-700/80 px-6 py-3 mt-auto text-center text-[11px] font-mono text-slate-500">
-        Electrical Forensics Platform • Padrão IEEE C37.111 / IEC 61000-4-30 • Análise Pericial Trifásica
+        Electrical Forensics Platform • IEEE C37.111 / IEC 61000-4-30 Standard • Three-Phase Forensic Analysis
       </footer>
     </div>
   );

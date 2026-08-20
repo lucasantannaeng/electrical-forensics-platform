@@ -2,7 +2,7 @@
 -- Supabase Schema: Electrical Forensics Platform (Multi-Tenant B2B SaaS)
 -- ====================================================================
 
--- 1. Tenants (Organizações / Empresas Clientes White-Label)
+-- 1. Tenants (White-Label Organizations / Client Accounts)
 create table if not exists tenants (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -11,17 +11,17 @@ create table if not exists tenants (
   created_at timestamptz default now()
 );
 
--- 2. Users (Membros com controle de acesso por Tenant)
+-- 2. Users (Members with tenant-scoped role-based access control)
 create table if not exists users (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
   email text unique not null,
   full_name text,
-  role text default 'operator', -- operator, perito, admin, viewer
+  role text default 'operator', -- operator, forensic_expert, admin, viewer
   created_at timestamptz default now()
 );
 
--- 3. Investigations (Casos Periciais e Sessões de Análise)
+-- 3. Investigations (Forensic Cases and Analysis Sessions)
 create table if not exists investigations (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
@@ -36,13 +36,13 @@ create table if not exists investigations (
   updated_at timestamptz default now()
 );
 
--- 4. COMTRADE Files (Arquivos de Oscilografia IEEE C37.111)
+-- 4. COMTRADE Files (IEEE C37.111 Oscillogram Records)
 create table if not exists comtrade_files (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
   investigation_id uuid references investigations(id) on delete cascade not null,
   file_name text not null,
-  file_type text not null, -- 'CFG' ou 'DAT'
+  file_type text not null, -- 'CFG' or 'DAT'
   file_size bigint,
   storage_path text,
   sampling_rate_hz double precision,
@@ -70,7 +70,7 @@ create table if not exists analysis_results (
   created_at timestamptz default now()
 );
 
--- 6. SCADA Logs (Registros temporais complementares)
+-- 6. SCADA Logs (Complementary Time-Series Telemetry)
 create table if not exists scada_logs (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
@@ -81,7 +81,7 @@ create table if not exists scada_logs (
   uploaded_at timestamptz default now()
 );
 
--- 7. DGA Results (Análise de Gases Dissolvidos em Transformadores)
+-- 7. DGA Results (Dissolved Gas Analysis for Power Transformers)
 create table if not exists dga_results (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
@@ -99,7 +99,7 @@ create table if not exists dga_results (
   uploaded_at timestamptz default now()
 );
 
--- 8. Reports (Laudos Periciais Gerados em PDF / JSON)
+-- 8. Reports (Generated Forensic Technical Reports in PDF / JSON)
 create table if not exists reports (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid references tenants(id) on delete cascade not null,
@@ -121,7 +121,7 @@ alter table scada_logs enable row level security;
 alter table dga_results enable row level security;
 alter table reports enable row level security;
 
--- Policies: Usuários acessam apenas dados do seu próprio Tenant
+-- Policies: Users can only access data belonging to their own tenant
 create policy "Tenants isolation policy" on tenants
   for all using (true);
 

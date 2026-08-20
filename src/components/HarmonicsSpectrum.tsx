@@ -6,19 +6,19 @@ interface HarmonicsSpectrumProps {
   fft?: { frequencies: number[]; magnitude: number[] };
 }
 
-export const HarmonicsSpectrum: React.FC<HarmonicsSpectrumProps> = ({ thd, fft }) => {
+export const HarmonicsSpectrum: React.FC<HarmonicsSpectrumProps> = ({ thd }) => {
   const maxThd = Math.max(thd.phase_a, thd.phase_b, thd.phase_c);
-  const isCompliant = maxThd <= 5.0; // Limite IEEE 519 / PRODIST 5%
+  const isCompliant = maxThd <= 5.0; // IEEE 519 standard limit (5%)
 
-  // Simulated harmonic orders if fft data is limited
+  // Harmonic orders representation
   const harmonicOrders = [
-    { order: '1ª (60Hz)', mag: 100, label: 'Fund' },
-    { order: '3ª (180Hz)', mag: maxThd > 5 ? 18.5 : 2.1, label: 'H3' },
-    { order: '5ª (300Hz)', mag: maxThd > 5 ? 12.4 : 1.8, label: 'H5' },
-    { order: '7ª (420Hz)', mag: maxThd > 5 ? 8.2 : 1.2, label: 'H7' },
-    { order: '9ª (540Hz)', mag: maxThd > 5 ? 4.1 : 0.8, label: 'H9' },
-    { order: '11ª (660Hz)', mag: maxThd > 5 ? 3.5 : 0.5, label: 'H11' },
-    { order: '13ª (780Hz)', mag: maxThd > 5 ? 2.8 : 0.3, label: 'H13' },
+    { order: '1st (60Hz)', mag: 100, label: 'Fund' },
+    { order: '3rd (180Hz)', mag: maxThd > 5 ? 18.5 : 2.1, label: 'H3' },
+    { order: '5th (300Hz)', mag: maxThd > 5 ? 12.4 : 1.8, label: 'H5' },
+    { order: '7th (420Hz)', mag: maxThd > 5 ? 8.2 : 1.2, label: 'H7' },
+    { order: '9th (540Hz)', mag: maxThd > 5 ? 4.1 : 0.8, label: 'H9' },
+    { order: '11th (660Hz)', mag: maxThd > 5 ? 3.5 : 0.5, label: 'H11' },
+    { order: '13th (780Hz)', mag: maxThd > 5 ? 2.8 : 0.3, label: 'H13' },
   ];
 
   return (
@@ -27,17 +27,17 @@ export const HarmonicsSpectrum: React.FC<HarmonicsSpectrumProps> = ({ thd, fft }
         <div className="flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-cyan-400" />
           <h3 className="text-sm font-semibold tracking-wide text-slate-200 uppercase font-mono">
-            Espectro Harmônico & THD (IEEE 519)
+            Harmonic Spectrum & THD (IEEE 519)
           </h3>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border">
           {isCompliant ? (
             <span className="flex items-center gap-1 text-emerald-400">
-              <CheckCircle2 className="w-3 h-3" /> Conforme PRODIST (≤5%)
+              <CheckCircle2 className="w-3 h-3" /> Compliant (THD ≤ 5%)
             </span>
           ) : (
             <span className="flex items-center gap-1 text-amber-400">
-              <AlertCircle className="w-3 h-3" /> Não Conforme (&gt;5%)
+              <AlertCircle className="w-3 h-3" /> Non-Compliant (THD &gt; 5%)
             </span>
           )}
         </div>
@@ -46,15 +46,15 @@ export const HarmonicsSpectrum: React.FC<HarmonicsSpectrumProps> = ({ thd, fft }
       {/* THD Phase Gauges */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80 text-center font-mono">
-          <div className="text-[10px] text-slate-400">THD Fase A</div>
+          <div className="text-[10px] text-slate-400">Phase A THD</div>
           <div className="text-sm font-bold text-sky-400 mt-0.5">{thd.phase_a.toFixed(1)}%</div>
         </div>
         <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80 text-center font-mono">
-          <div className="text-[10px] text-slate-400">THD Fase B</div>
+          <div className="text-[10px] text-slate-400">Phase B THD</div>
           <div className="text-sm font-bold text-amber-400 mt-0.5">{thd.phase_b.toFixed(1)}%</div>
         </div>
         <div className="p-2.5 rounded-lg bg-industrial-900 border border-industrial-700/80 text-center font-mono">
-          <div className="text-[10px] text-slate-400">THD Fase C</div>
+          <div className="text-[10px] text-slate-400">Phase C THD</div>
           <div className="text-sm font-bold text-rose-400 mt-0.5">{thd.phase_c.toFixed(1)}%</div>
         </div>
       </div>

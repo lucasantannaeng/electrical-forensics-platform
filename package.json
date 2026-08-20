@@ -1,7 +1,9 @@
 {
   "name": "electrical-forensics-platform",
   "version": "0.1.0",
-  "private": true,
+  "description": "B2B White-Label SaaS for automated electrical forensics diagnosis and IEEE COMTRADE oscillogram analysis",
+  "license": "MIT",
+  "author": "Luca Rodrigues Gomes de Sant'Anna <lucasantannaeng@gmail.com>",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

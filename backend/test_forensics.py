@@ -20,7 +20,7 @@ from main import (
 )
 
 def test_parse_comtrade_cfg_valid():
-    cfg_text = """Subestação Alfa, IED_SEL_700
+    cfg_text = """Alpha Substation, IED_SEL_700
 2013,1999
 3A,0D
 1,VA,A,V,1.0,0.0,0,-1000,1000,13800,115,P
@@ -33,12 +33,12 @@ def test_parse_comtrade_cfg_valid():
 1
 """
     meta = parse_comtrade_cfg(cfg_text)
-    assert meta["station_name"] == "Subestação Alfa"
+    assert meta["station_name"] == "Alpha Substation"
     assert meta["recorder_id"] == "IED_SEL_700"
     assert meta["num_analog"] == 3
     assert meta["frequency"] == 60.0
     assert len(meta["analog_channels"]) == 3
-    assert meta["analog_channels[0]"]["id"] if "analog_channels[0]" in meta else meta["analog_channels"][0]["id"] == "VA"
+    assert meta["analog_channels"][0]["id"] == "VA"
 
 def test_calculate_symmetrical_components_balanced():
     t = np.linspace(0, 1/60, 600)
@@ -61,7 +61,7 @@ def test_diagnose_fault_ground_fault():
     }
     diag = diagnose_fault(rms_a=12.0, rms_b=95.0, rms_c=98.0, sym_comp=sym_comp, thd_a=2.0, thd_b=2.1, thd_c=1.9)
     assert diag["severity"] == "CRITICAL"
-    assert "Fase-Terra" in diag["faultTypeName"]
+    assert "Phase-to-Ground" in diag["faultTypeName"]
     assert "A-G" in diag["faultTypeName"]
 
 if __name__ == "__main__":

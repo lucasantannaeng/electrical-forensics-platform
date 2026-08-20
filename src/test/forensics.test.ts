@@ -15,7 +15,7 @@ describe('Electrical Forensics Engine — Test Suite', () => {
     const sample = getSampleComtrade('ground_fault');
     const metadata = parseComtradeCfg(sample.cfg);
 
-    expect(metadata.station_name).toBe('Subestação Mina Central');
+    expect(metadata.station_name).toBe('Central Substation');
     expect(metadata.recorder_id).toBe('RECORDER_SEL_700G');
     expect(metadata.num_analog).toBe(3);
     expect(metadata.frequency).toBe(60);
@@ -86,7 +86,7 @@ describe('Electrical Forensics Engine — Test Suite', () => {
 
     expect(result.status).toBe('success');
     expect(result.diagnosis.severity).toBe('CRITICAL');
-    expect(result.diagnosis.faultTypeName).toContain('Fase-Terra');
+    expect(result.diagnosis.faultTypeName).toContain('Phase-to-Ground');
     expect(result.diagnosis.confidence).toBeGreaterThan(90);
   });
 
@@ -96,7 +96,7 @@ describe('Electrical Forensics Engine — Test Suite', () => {
 
     expect(result.status).toBe('success');
     expect(result.thd.phase_a).toBeGreaterThan(8.0);
-    expect(result.diagnosis.faultTypeName).toContain('Harmônica');
+    expect(result.diagnosis.faultTypeName).toContain('Harmonic');
   });
 
   it('should validate normal operating regime', () => {
@@ -105,6 +105,6 @@ describe('Electrical Forensics Engine — Test Suite', () => {
 
     expect(result.status).toBe('success');
     expect(result.diagnosis.severity).toBe('NORMAL');
-    expect(result.diagnosis.faultTypeName).toContain('Regime Permanente');
+    expect(result.diagnosis.faultTypeName).toContain('Normal');
   });
 });

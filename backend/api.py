@@ -12,11 +12,11 @@ from main import analyze_comtrade
 
 app = FastAPI(
     title="Electrical Forensics Platform API",
-    description="Motor de Perícia e Diagnóstico de Oscilografias Elétricas IEEE COMTRADE",
+    description="Forensic Diagnostic Engine for IEEE COMTRADE Electrical Oscillograms",
     version="1.0.0"
 )
 
-# CORS para permitir conexões do frontend Vite (local ou em nuvem)
+# CORS configuration to allow local and cloud frontend origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,13 +36,13 @@ async def root():
 
 @app.post("/analyze")
 async def analyze_files(
-    comtrade_cfg: UploadFile = File(..., description="Arquivo de configuração (.cfg)"),
-    comtrade_dat: UploadFile = File(..., description="Arquivo de dados de oscilografia (.dat)"),
+    comtrade_cfg: UploadFile = File(..., description="Configuration file (.cfg)"),
+    comtrade_dat: UploadFile = File(..., description="Oscillogram data file (.dat)"),
     scada_logs: Optional[UploadFile] = File(None),
     dga_results: Optional[UploadFile] = File(None)
 ):
     """
-    Analisa registros oscilográficos COMTRADE e retorna componentes simétricas, THD, RMS e diagnóstico pericial.
+    Analyze COMTRADE oscillogram files and return symmetrical components, THD, RMS, and automated forensic diagnosis.
     """
     try:
         cfg_content = (await comtrade_cfg.read()).decode('utf-8', errors='replace')
@@ -62,7 +62,7 @@ async def analyze_files(
 @app.get("/sample-data")
 async def get_sample_data():
     """
-    Retorna o caminho ou dados dos arquivos de exemplo para testes imediatos.
+    Returns analysis of server sample COMTRADE files for quick validation.
     """
     sample_cfg_path = os.path.join(os.path.dirname(__file__), "sample.cfg")
     sample_dat_path = os.path.join(os.path.dirname(__file__), "sample.dat")
@@ -74,7 +74,7 @@ async def get_sample_data():
             dat = f.read()
         return analyze_comtrade(cfg, dat)
     
-    return {"status": "error", "message": "Arquivos de amostra não encontrados no servidor."}
+    return {"status": "error", "message": "Sample files not found on server."}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

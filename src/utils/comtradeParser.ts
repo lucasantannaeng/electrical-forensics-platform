@@ -14,20 +14,20 @@ import {
 export function parseComtradeCfg(cfgContent: string): ComtradeMetadata {
   const lines = cfgContent.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if (lines.length === 0) {
-    throw new Error('Arquivo de configuração COMTRADE (.cfg) vazio');
+    throw new Error('Empty COMTRADE configuration file (.cfg)');
   }
 
-  // Linha 1: Nome da Estação, ID do Gravador
+  // Line 1: Station Name, Recorder ID
   const parts0 = lines[0].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
-  const station_name = parts0[0] || 'Subestação Industrial';
+  const station_name = parts0[0] || 'Industrial Substation';
   const recorder_id = parts0[1] || 'IED_01';
 
-  // Linha 2: Ano da norma e versão
+  // Line 2: Standard Year and Version
   const parts1 = lines[1] ? lines[1].split(',').map(p => p.trim().replace(/^"|"$/g, '')) : [];
   const year = parseInt(parts1[0], 10) || 1999;
   const version = parseInt(parts1[1], 10) || 1;
 
-  // Linha 3: Total de Canais, Canais Analógicos (A), Canais Digitais (D)
+  // Line 3: Total Channels, Analog Channels (A), Digital Channels (D)
   const parts2 = lines[2] ? lines[2].split(',').map(p => p.trim()) : [];
   let num_analog = 0;
   let num_digital = 0;
@@ -39,7 +39,7 @@ export function parseComtradeCfg(cfgContent: string): ComtradeMetadata {
     num_digital = parseInt(parts2[1].replace(/D/i, ''), 10) || 0;
   }
 
-  // Leitura dos canais analógicos
+  // Parse analog channel definitions
   const analog_channels: AnalogChannel[] = [];
   const startIdx = 3;
 
@@ -78,7 +78,7 @@ export function parseComtradeCfg(cfgContent: string): ComtradeMetadata {
     }
   }
 
-  // Frequência nominal da rede
+  // Nominal power frequency
   const freqLineIdx = startIdx + num_analog + num_digital;
   let frequency = 60.0;
   if (freqLineIdx < lines.length) {
@@ -86,10 +86,10 @@ export function parseComtradeCfg(cfgContent: string): ComtradeMetadata {
     frequency = parseFloat(parts[0]) || 60.0;
   }
 
-  // Linha de nrates (número de taxas de amostragem, ex: 1)
+  // Number of sampling rates (nrates)
   const nratesLineIdx = freqLineIdx + 1;
 
-  // Linha da taxa de amostragem e quantidade de amostras (ex: 10000, 600)
+  // Sampling rate and number of samples (samp_rate, last_samp)
   const sampleRateLineIdx = nratesLineIdx + 1;
   let nr_samples = 1000;
   let sample_rate = 10000;
@@ -156,7 +156,7 @@ export function parseComtradeDat(datText: string, metadata: ComtradeMetadata): T
 }
 
 /**
- * Extração de Fasor Fundamental com janela síncrona
+ * Synchronous fundamental phasor extraction (DFT at fundamental frequency f0)
  */
 function extractFundamentalPhasor(signal: number[], sampleRate: number, freq: number = 60): { re: number; im: number; mag: number } {
   const totalN = signal.length;
@@ -183,7 +183,7 @@ function extractFundamentalPhasor(signal: number[], sampleRate: number, freq: nu
 }
 
 /**
- * Cálculo de Componentes Simétricas de Fortescue
+ * Symmetrical components decomposition (Fortescue transformation)
  */
 export function calculateSymmetricalComponents(
   phaseA: number[],
@@ -255,7 +255,7 @@ export function calculateSymmetricalComponents(
 }
 
 /**
- * Cálculo de Valor Eficaz RMS
+ * Root Mean Square (RMS) calculation
  */
 export function calculateRms(signal: number[]): number {
   if (!signal || signal.length === 0) return 0;
@@ -267,7 +267,7 @@ export function calculateRms(signal: number[]): number {
 }
 
 /**
- * Cálculo de FFT e Harmônicos
+ * FFT and Total Harmonic Distortion (THD) calculation
  */
 export function calculateFftAndThd(signal: number[], sampleRate: number, freq: number = 60): {
   freqs: number[];
@@ -328,7 +328,7 @@ export function calculateFftAndThd(signal: number[], sampleRate: number, freq: n
 }
 
 /**
- * Diagnóstico Forense Automático de Falhas
+ * Automated Electrical Forensic Fault Diagnosis
  */
 export function diagnoseFault(
   rmsA: number,
@@ -343,7 +343,7 @@ export function diagnoseFault(
   const minRms = Math.min(rmsA, rmsB, rmsC);
   const maxThd = Math.max(thdA, thdB, thdC);
 
-  // 1. Falha Fase-Terra (Alta Sequência Zero e desbalanço)
+  // 1. Single Phase-to-Ground Fault (High zero sequence V0 & unbalance)
   if (symComp.zeroMagAvg > 0.08 * symComp.posMagAvg && symComp.voltageUnbalanceRate > 10) {
     let phase = 'A';
     if (rmsB < rmsA && rmsB < rmsC) phase = 'B';
@@ -351,68 +351,68 @@ export function diagnoseFault(
 
     return {
       faultType: `PHASE_${phase}_GROUND` as any,
-      faultTypeName: `Curto-Circuito Monofásico Fase-Terra (${phase}-G)`,
+      faultTypeName: `Single Phase-to-Ground Short Circuit (${phase}-G)`,
       severity: 'CRITICAL',
-      description: `Detectada elevação severa de sequência zero (V0 = ${symComp.zeroMagAvg}V) com colapso na Fase ${phase} (${minRms.toFixed(1)}V). Rompimento de isolação para terra.`,
+      description: `Severe zero-sequence elevation detected (V0 = ${symComp.zeroMagAvg}V) with voltage collapse on Phase ${phase} (${minRms.toFixed(1)}V). Characteristic of insulation breakdown to ground.`,
       confidence: 94.8,
       durationMs: 45.2,
-      recommendation: 'Inspecionar isoladores da fase afetada, cabos alimentadores e relé de proteção de sobrecorrente de terra (ANSI 50N/51N).',
+      recommendation: 'Inspect phase insulators, feeder cables, and ground overcurrent protection relay (ANSI 50N/51N).',
     };
   }
 
-  // 2. Falha Bifásica Fase-Fase (Alta Sequência Negativa V2, V0 insignificante)
+  // 2. Phase-to-Phase Fault (High negative sequence V2, negligible V0)
   if (symComp.voltageUnbalanceRate > 15) {
     return {
       faultType: 'PHASE_AB_FAULT',
-      faultTypeName: 'Curto-Circuito Bifásico Entre Fases (Fase-Fase)',
+      faultTypeName: 'Phase-to-Phase Short Circuit (Line-to-Line)',
       severity: 'CRITICAL',
-      description: `Desbalanço severo com alta componente de sequência negativa (VUF = ${symComp.voltageUnbalanceRate}%). Sem envolvimento de terra.`,
+      description: `Severe unbalance with elevated negative-sequence component (VUF = ${symComp.voltageUnbalanceRate}%). No significant ground involvement.`,
       confidence: 91.5,
       durationMs: 62.0,
-      recommendation: 'Verificar distanciamento dielétrico entre barramentos e relés de proteção diferencial/distância (ANSI 87/21).',
+      recommendation: 'Verify busbar dielectric clearances and distance/differential protection relays (ANSI 87/21).',
     };
   }
 
-  // 3. Poluição Harmônica Elevada
+  // 3. Excessive Harmonic Distortion
   if (maxThd > 8.0) {
     return {
       faultType: 'HARMONIC_DISTORTION',
-      faultTypeName: 'Poluição Harmônica Severa (THD Excessivo)',
+      faultTypeName: 'Severe Harmonic Pollution (Excessive THD)',
       severity: 'HIGH',
-      description: `THD detectado em ${maxThd.toFixed(1)}% (limite recomendado IEEE 519 / PRODIST é 5% a 8%). Risco de sobreaquecimento de transformadores e queima de capacitores.`,
+      description: `THD measured at ${maxThd.toFixed(1)}% (IEEE 519 / IEC recommended limit is 5% to 8%). Risk of transformer overheating and capacitor bank failure.`,
       confidence: 96.2,
       durationMs: 0,
-      recommendation: 'Instalar filtros harmônicos ativos e reatores de linha em inversores de frequência (VFDs).',
+      recommendation: 'Install active/passive harmonic filters and line reactors on variable frequency drives (VFDs).',
     };
   }
 
-  // 4. Afundamento Momentâneo de Tensão (Voltage Sag)
+  // 4. Momentary Voltage Sag
   if (minRms < 0.85 * avgRms && minRms > 0.3 * avgRms) {
     return {
       faultType: 'VOLTAGE_SAG',
-      faultTypeName: 'Afundamento Momentâneo de Tensão (Voltage Sag)',
+      faultTypeName: 'Momentary Voltage Sag',
       severity: 'MEDIUM',
-      description: `Queda temporária de tensão abaixo de 85% do valor nominal, típica de partida de motores de grande porte.`,
+      description: `Temporary voltage drop below 85% of nominal, typical of large motor starting or nearby grid fault clearance.`,
       confidence: 88.0,
       durationMs: 120.0,
-      recommendation: 'Analisar tempo de aceleração de motores pesados e soft-starters.',
+      recommendation: 'Analyze motor acceleration time, soft-starters, and substation coordination curves.',
     };
   }
 
-  // 5. Operação Normal / Estável
+  // 5. Normal Stable Operation
   return {
     faultType: 'NORMAL',
-    faultTypeName: 'Regime Permanente Estável (Sem Faltas)',
+    faultTypeName: 'Steady-State Normal Operation (No Faults)',
     severity: 'NORMAL',
-    description: `Formas de onda balanceadas (VUF = ${symComp.voltageUnbalanceRate}%), baixos harmônicos e valor RMS dentro dos limites normativos (PRODIST / IEEE Std 1159).`,
+    description: `Balanced three-phase waveforms (VUF = ${symComp.voltageUnbalanceRate}%), low harmonic distortion, and RMS values within standard limits (IEEE Std 1159 / IEC 61000-4-30).`,
     confidence: 99.1,
     durationMs: 0,
-    recommendation: 'Nenhuma ação corretiva necessária. Manter cronograma de manutenção preditiva periódica.',
+    recommendation: 'No corrective action required. Maintain standard predictive maintenance schedule.',
   };
 }
 
 /**
- * Análise Forense Completa em TypeScript
+ * Full Forensic Analysis in TypeScript (Client-Side)
  */
 export function analyzeComtradeClient(cfgContent: string, datContent: string): ForensicAnalysisResult {
   const metadata = parseComtradeCfg(cfgContent);
@@ -420,7 +420,7 @@ export function analyzeComtradeClient(cfgContent: string, datContent: string): F
 
   const channelKeys = Object.keys(time_series.analog);
   if (channelKeys.length < 3) {
-    throw new Error('O arquivo COMTRADE precisa conter pelo menos 3 canais analógicos para análise trifásica.');
+    throw new Error('COMTRADE file must contain at least 3 analog channels for three-phase analysis.');
   }
 
   const phaseA = time_series.analog[channelKeys[0]] || [];
@@ -473,7 +473,7 @@ export function analyzeComtradeClient(cfgContent: string, datContent: string): F
 }
 
 /**
- * Gerador de Amostras COMTRADE
+ * Generate synthetic COMTRADE sample datasets for instant demonstration
  */
 export function getSampleComtrade(type: 'ground_fault' | 'harmonics' | 'normal' = 'ground_fault'): {
   cfg: string;
@@ -483,7 +483,7 @@ export function getSampleComtrade(type: 'ground_fault' | 'harmonics' | 'normal' 
   const numSamples = 600;
   const freq = 60;
 
-  const cfg = `Subestação Mina Central, RECORDER_SEL_700G
+  const cfg = `Central Substation, RECORDER_SEL_700G
 2013,1999
 3A,0D
 1,VA,A,V,1.0,0.0,0,-10000,10000,13800,115,P
@@ -508,12 +508,12 @@ ${sampleRate},${numSamples}
     let vc = V_nom * Math.sin(2 * Math.PI * freq * t + (2 * Math.PI) / 3);
 
     if (type === 'ground_fault') {
-      // Curto Fase A para Terra
+      // Phase A Ground Short Circuit
       va = va * 0.15;
       vb = vb * 1.45;
       vc = vc * 1.45;
     } else if (type === 'harmonics') {
-      // Injeção harmônica 3ª e 5ª mantendo equilíbrio trifásico
+      // 3rd and 5th harmonic injection
       const h3_a = 0.25 * V_nom * Math.sin(2 * Math.PI * 3 * freq * t);
       const h5_a = 0.18 * V_nom * Math.sin(2 * Math.PI * 5 * freq * t);
       const h3_b = 0.25 * V_nom * Math.sin(2 * Math.PI * 3 * freq * t - (2 * Math.PI) / 3);

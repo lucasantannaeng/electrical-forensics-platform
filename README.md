@@ -1,138 +1,146 @@
-# ⚡ Electrical Forensics Platform (Plataforma Pericial Elétrica B2B)
+# ⚡ Electrical Forensics Platform (B2B SaaS)
 
-Plataforma SaaS B2B White-Label de alta performance para **diagnóstico forense e perícia de falhas em sistemas elétricos industriais**, automatizando a ingestão e análise de oscilografias no padrão internacional **IEEE COMTRADE (C37.111)**.
+An enterprise-grade B2B White-Label SaaS platform for **automated electrical forensic diagnosis and industrial failure analysis**, ingesting and processing oscillograms adhering to the international **IEEE COMTRADE (C37.111)** standard.
 
----
-
-## 🌟 Principais Funcionalidades
-
-- **Ingestão Universal IEEE COMTRADE:** Leitura e decodificação precisa de arquivos de configuração (`.cfg`) e dados temporais (`.dat`) segundo as normas IEEE C37.111-1991, 1999 e 2013.
-- **Oscilografia Interativa em Alta Resolução:** Visualizador de ondas trifásicas ($V_a, V_b, V_c$) com aceleração via HTML5 Canvas, cursores de medição em tempo real e seleção dinâmica de canais.
-- **Decomposição de Fortescue (Componentes Simétricas):** Cálculo exato de fasores fundamentais e sequências:
-  - **Sequência Positiva ($V_1$):** Potência ativa e regime equilibrado.
-  - **Sequência Negativa ($V_2$):** Desbalanço de carga e curtos entre fases.
-  - **Sequência Zero ($V_0$):** Correntes de retorno e faltas à terra.
-  - **Taxa de Desbalanço de Tensão (VUF %):** Conforme IEC 61000-4-30.
-- **Análise Harmônica e THD (IEEE 519 / PRODIST):** Espectro FFT com identificação de ordens harmônicas (3ª, 5ª, 7ª, 9ª, 11ª, etc.) e verificação automática de conformidade.
-- **Diagnóstico Pericial Automatizado:** Classificador inteligente de eventos transitórios e perturbações:
-  - Curto-Circuito Monofásico Fase-Terra ($A-G$, $B-G$, $C-G$)
-  - Curto-Circuito Bifásico Entre Fases (Fase-Fase)
-  - Curto-Circuito Trifásico Simétrico
-  - Afundamento Momentâneo de Tensão (*Voltage Sag*)
-  - Poluição Harmônica Excessiva (THD &gt; 5%)
-  - Regime Permanente Estável
-- **Geração Instantânea de Laudo Pericial:** Emissão de laudo técnico em formato estruturado (JSON e visualização para impressão/PDF).
-- **Motor Híbrido (Client-Side + FastAPI):** O frontend executa todo o processamento de forma autônoma e instantânea no navegador, integrando-se automaticamente com a API Python/FastAPI quando o servidor local estiver ativo.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2-cyan.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-4.0-purple.svg)](https://vitejs.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.95-emerald.svg)](https://fastapi.tiangolo.com/)
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🌟 Key Features
 
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS (Tema Dark Slate/Cyan Industrial), Lucide Icons, Canvas 2D Rendering.
-- **Testes & QA:** Vitest, TypeScript strict type checking (`tsc --noEmit`).
+- **Universal IEEE COMTRADE Ingestion:** High-fidelity decoding of configuration (`.cfg`) and time-series data (`.dat`) files complying with IEEE C37.111-1991, 1999, and 2013 standards.
+- **High-Performance Oscillography Canvas:** Real-time rendering of three-phase voltage and current waveforms ($V_a, V_b, V_c$) with interactive time-measurement cursors and selective channel toggling.
+- **Fortescue Symmetrical Components Decomposition:** Exact calculation of fundamental phasors and sequence components:
+  - **Positive Sequence ($V_1$):** Active power transmission and balanced load.
+  - **Negative Sequence ($V_2$):** System unbalance and phase-to-phase faults.
+  - **Zero Sequence ($V_0$):** Ground return current and earth faults.
+  - **Voltage Unbalance Rate (VUF %):** In accordance with IEC 61000-4-30 standard.
+- **Harmonic Distortion & THD Analysis (IEEE 519):** Full FFT spectral decomposition with individual harmonic orders (3rd, 5th, 7th, 9th, 11th, etc.) and automated compliance checks.
+- **Automated Forensic Event Classifier:** Machine-assisted diagnostic engine identifying:
+  - Single Phase-to-Ground Faults ($A-G$, $B-G$, $C-G$)
+  - Phase-to-Phase Line Faults ($A-B$, $B-C$, $C-A$)
+  - Symmetrical Three-Phase Faults
+  - Momentary Voltage Sags & Swells
+  - Severe Harmonic Pollution (THD &gt; 5%)
+  - Steady-State Normal Operation
+- **Instant Engineering Forensic Report:** Generates structured technical reports ready for PDF printing and JSON export.
+- **Dual Hybrid Architecture (Client-Side & FastAPI):** Autonomous in-browser client-side engine with automatic connection to local/cloud FastAPI backend when online.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS (Industrial Dark Slate/Cyan theme), Lucide Icons, HTML5 Canvas 2D.
+- **Testing & QA:** Vitest, strict static type checking (`tsc --noEmit`).
 - **Backend:** Python 3.11+, FastAPI, Uvicorn, NumPy, SciPy (FFT), Python-Multipart.
-- **Banco de Dados:** Supabase (PostgreSQL com Row Level Security multi-tenant).
-- **CI/CD:** GitHub Actions Pipeline.
+- **Database:** Supabase (PostgreSQL with Row Level Security multi-tenant isolation).
+- **CI/CD:** GitHub Actions.
 
 ---
 
-## 🚀 Como Executar o Projeto
+## 🚀 Getting Started
 
-### 1. Executando o Frontend (React + Vite)
+### 1. Running the Frontend (React + Vite)
 
-1. Instale as dependências:
+1. Install Node dependencies:
    ```bash
    npm install
    ```
-2. Execute o servidor de desenvolvimento:
+2. Start the development server:
    ```bash
    npm run dev
    ```
-3. Abra no navegador em [http://localhost:5173](http://localhost:5173).
-4. No topo da tela, selecione um dos **Cenários Pré-configurados** (*Fase-Terra*, *Harmônicas* ou *Regime Normal*) ou faça upload dos seus próprios arquivos `.cfg` e `.dat`.
+3. Open in your browser at [http://localhost:5173](http://localhost:5173).
+4. Select one of the pre-configured **Scenarios** (*Phase-to-Ground*, *Harmonics*, *Normal Operation*) in the top HUD, or upload your own `.cfg` and `.dat` files.
 
 ---
 
-### 2. Executando a Suíte de Testes do Frontend
+### 2. Running Frontend Tests & Typecheck
 
-Para rodar os testes unitários de validação matemática e diagnóstica:
+To run automated unit tests:
 ```bash
 npm test
 ```
-Para verificar a tipagem estática do TypeScript:
+To verify TypeScript static types:
 ```bash
 npm run typecheck
 ```
-Para compilar o pacote de produção otimizado:
+To build the optimized production bundle:
 ```bash
 npm run build
 ```
 
 ---
 
-### 3. Executando o Backend Python (FastAPI) [Opcional]
+### 3. Running the Python Backend (FastAPI) [Optional]
 
-1. Navegue até a pasta `backend/`:
+1. Navigate to the `backend/` directory:
    ```bash
    cd backend
    ```
-2. Crie e ative um ambiente virtual:
+2. Create and activate a Python virtual environment:
    ```bash
    python -m venv .venv
-   # No Windows (PowerShell):
+   # Windows (PowerShell):
    .\.venv\Scripts\Activate.ps1
-   # No Linux / macOS:
+   # Linux / macOS:
    source .venv/bin/activate
    ```
-3. Instale as dependências do backend:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Inicie o servidor FastAPI:
+4. Start the FastAPI server:
    ```bash
    uvicorn api:app --reload --port 8000
    ```
-5. Acesse a documentação Swagger interativa em [http://localhost:8000/docs](http://localhost:8000/docs).
+5. View interactive Swagger API documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
 
 ---
 
-## 🏛️ Estrutura de Diretórios
+## 🏛️ Directory Structure
 
 ```
 electrical-forensics-platform/
-├── .github/workflows/ci.yml       # Pipeline automatizada de CI/CD
-├── backend/                       # Motor de processamento em Python / FastAPI
-│   ├── api.py                     # Endpoints REST e CORS
-│   ├── main.py                    # Parser COMTRADE, Fortescue e FFT
-│   ├── requirements.txt           # Dependências Python
-│   ├── sample.cfg                 # Registro de exemplo COMTRADE (Config)
-│   └── sample.dat                 # Registro de exemplo COMTRADE (Dados)
+├── .github/workflows/ci.yml       # Automated CI/CD pipeline
+├── backend/                       # Python / FastAPI calculation engine
+│   ├── api.py                     # REST endpoints & CORS
+│   ├── main.py                    # COMTRADE parser, Fortescue & FFT engine
+│   ├── requirements.txt           # Python dependencies
+│   ├── sample.cfg                 # Example COMTRADE config
+│   └── sample.dat                 # Example COMTRADE data
 ├── src/
-│   ├── components/                # Componentes da Interface Industrial
-│   │   ├── FaultDiagnosticCard.tsx  # Card de parecer técnico e severidade
-│   │   ├── ForensicReportModal.tsx  # Modal de laudo pericial (PDF/JSON)
-│   │   ├── HarmonicsSpectrum.tsx   # Espectro harmônico e gauges de THD
-│   │   ├── OscillogramViewer.tsx   # Visualizador de formas de onda em Canvas
-│   │   └── PhasorDiagram.tsx       # Gráfico polar e decomposição de Fortescue
-│   ├── types/                     # Tipagens estritas de engenharia
+│   ├── components/                # Industrial UI components
+│   │   ├── FaultDiagnosticCard.tsx  # Technical assessment card
+│   │   ├── ForensicReportModal.tsx  # Forensic report modal (PDF/JSON)
+│   │   ├── HarmonicsSpectrum.tsx   # Harmonic spectrum & THD gauges
+│   │   ├── OscillogramViewer.tsx   # Canvas 2D waveform renderer
+│   │   └── PhasorDiagram.tsx       # Polar phasor diagram & Fortescue
+│   ├── types/                     # Engineering domain types
 │   │   └── forensics.ts
-│   ├── utils/                     # Motor matemático e parser client-side
+│   ├── utils/                     # Client-side math & COMTRADE parser
 │   │   └── comtradeParser.ts
-│   ├── test/                      # Testes unitários com Vitest
+│   ├── test/                      # Vitest unit test suite
 │   │   └── forensics.test.ts
-│   ├── App.tsx                    # Dashboard principal em Bento Grid
-│   ├── main.tsx                   # Ponto de entrada React
-│   └── index.css                  # Design system Slate/Cyan Industrial
-├── supabase/                      # Schema DDL com RLS Multi-Tenant
+│   ├── App.tsx                    # Main HUD & dashboard
+│   ├── main.tsx                   # React root entrypoint
+│   └── index.css                  # Industrial Dark design system
+├── supabase/                      # Multi-tenant SQL schema with RLS
 │   └── schema.sql
-├── package.json                   # Scripts e dependências Node
-├── tsconfig.json                  # Configuração TypeScript
-├── vite.config.ts                 # Configuração de build do Vite
-└── README.md                      # Documentação técnica do projeto
+├── package.json                   # Node dependencies and scripts
+├── tsconfig.json                  # TypeScript configuration
+├── vite.config.ts                 # Vite bundler configuration
+└── README.md                      # Technical documentation
 ```
 
 ---
 
-## 📜 Licença
+## 📜 License
 
-Distribuído sob a licença **MIT**. Consulte `LICENSE` para mais detalhes.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+
+Copyright (c) 2026 Luca Rodrigues Gomes de Sant'Anna.
