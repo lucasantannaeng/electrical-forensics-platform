@@ -82,6 +82,94 @@ export interface FaultDiagnosis {
   recommendation: string;
 }
 
+// ==========================================
+// Normative Checklist & Audit Types
+// ==========================================
+
+export type NormativeStandard = 'NBR_5419' | 'NBR_5410' | 'NBR_16690' | 'NBR_17193' | 'NT_44_2025' | 'CBMERJ';
+export type ComplianceStatus = 'CONFORMING' | 'NON_CONFORMING' | 'NOT_APPLICABLE' | 'NOT_INSPECTED';
+
+export interface NormativeChecklistItem {
+  id: string;
+  standard: NormativeStandard;
+  clause: string;
+  title: string;
+  description: string;
+  status: ComplianceStatus;
+  isCritical: boolean;
+  notes?: string;
+  recommendation?: string;
+}
+
+export interface NormativeSection {
+  id: string;
+  title: string;
+  standard: NormativeStandard;
+  items: NormativeChecklistItem[];
+}
+
+export interface NormativeAuditState {
+  sections: NormativeSection[];
+  totalItems: number;
+  conformingCount: number;
+  nonConformingCount: number;
+  criticalNonConformities: number;
+  complianceScore: number; // 0 to 100%
+  lastUpdated: string;
+}
+
+// ==========================================
+// Electrical Fire Investigation & STJ Causal Nexus
+// ==========================================
+
+export type CopperMeltType = 
+  | 'PRIMARY_ARC_BEAD'       // Fusão por arco primário (início do sinistro, cratera interna, óxido restrito)
+  | 'SECONDARY_FIRE_MELTING' // Fusão secundária difusa (efeito térmico do fogo externo)
+  | 'NO_MELTING'             // Condutores íntegros
+  | 'NOT_ANALYZED';
+
+export type MaintenanceInterval = 
+  | 'UP_TO_DATE'             // < 6 meses com laudos e ART
+  | 'OVERDUE_6_TO_12_MONTHS' // 6 a 12 meses
+  | 'OVERDUE_OVER_12_MONTHS' // > 12 meses sem manutenção
+  | 'NEVER_PERFORMED';       // Nunca realizada / sem histórico
+
+export interface FireEvidenceInput {
+  buildingType: string;
+  installationAgeYears: number;
+  copperMelt: CopperMeltType;
+  hasThermographyReport: boolean;
+  thermographyOverdueMonths: number;
+  maintenanceInterval: MaintenanceInterval;
+  hasSpdaInstalled: boolean;
+  hasDpsInstalled: boolean;
+  dpsDefectiveOrBurnt: boolean;
+  circuitBreakerTripped: boolean;
+  tamperedProtection: boolean; // Disjuntor superdimensionado ou jumpeado
+  combustiblesNearPanels: boolean;
+  eyewitnessFlickerOrSparks: boolean;
+}
+
+export interface FireCausalNexusResult {
+  primaryElectricalCauseProb: number; // 0 to 100%
+  negligenceProbability: number;      // 0 to 100%
+  causalNexusClassification: 
+    | 'DEFINITIVE_ELECTRICAL_FAILURE' 
+    | 'PROBABLE_ELECTRICAL_FAILURE' 
+    | 'UNDETERMINED_SECONDARY_HEAT' 
+    | 'INCONCLUSIVE';
+  technicalSummary: string;
+  metallurgicalAnalysis: string;
+  maintenanceAssessment: string;
+  stjJurisprudenceEnforcement: {
+    appliesNoFortuitousCase: boolean;
+    citation: string;
+    civilCodeArticle: string;
+    liabilityNotice: string;
+  };
+  urgentCorrectiveActions: string[];
+}
+
 export interface ForensicAnalysisResult {
   metadata: ComtradeMetadata;
   time_series: TimeSeriesData;
@@ -106,6 +194,9 @@ export interface ForensicAnalysisResult {
     phase_c: PhaseAnalysis;
   };
   diagnosis: FaultDiagnosis;
+  normative_audit?: NormativeAuditState;
+  fire_investigation?: FireCausalNexusResult;
   status: 'success' | 'error';
   message?: string;
 }
+
